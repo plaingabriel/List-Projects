@@ -39,26 +39,27 @@ typedef struct node
  * * READ FUNCTION
  */
 
-void read(char *newLastName, char *newName, int *ci, int *day, int *month, int *year)
+void read(char *newLastName, char *newName, int *ci, int *day, int *month, int *year, int n)
 {
-  printf("Last Name: ");
+  printf("\nPersona nro %i:\n", n + 1);
+  printf("Apellido: ");
   scanf("%s", newLastName);
 
-  printf("Name: ");
+  printf("Nombre: ");
   scanf("%s", newName);
 
   printf("CI: ");
   scanf("%i", ci);
 
-  printf("Birth Date:\n");
+  printf("Fecha de Nacimiento:\n");
 
-  printf("Day: ");
+  printf("Dia: ");
   scanf("%i", day);
 
-  printf("Month: ");
+  printf("Mes: ");
   scanf("%i", month);
 
-  printf("Year: ");
+  printf("Anio: ");
   scanf("%i", year);
 }
 
@@ -66,38 +67,61 @@ void read(char *newLastName, char *newName, int *ci, int *day, int *month, int *
  * * SHOW FUNCTION
  */
 
-void show(Node *node)
+void show(Node *head)
 {
   // TODO: Fix the table
-  printf("Last Name                     | Name                    | CI                         | Birth Date\n");
-  printf("%s                            | %s                      | %d                         | %d/%d/%d\n", node->lastName, node->name, node->ci, node->date.day, node->date.month, node->date.year);
+  printf("Apellido\t\t\t\t| Nombre \t\t\t\t| CI \t\t\t\t| Fecha de Nacimiento\n");
+  // Iterate until the node is NULL
+  for (Node *p = head; p != NULL; p = p->link)
+    printf("%s \t\t\t\t| %s \t\t\t\t| %d \t\t\t\t| %d/%d/%d\n", p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
 }
 
 /**
  * * ADD NODE FUNCTION
  */
 
-Node *addNode(Node *node, char *newLastName, char *newName, int newCI, int d, int m, int y)
+Node *addNode(Node *head, char *newLastName, char *newName, int newCI, int d, int m, int y)
 {
+  Node *temp = NULL, *p = NULL;
   // Sizing node
-  node = (Node *)malloc(sizeof(Node));
+  temp = (Node *)malloc(sizeof(Node));
   // Fill char
-  strcpy(node->lastName, newLastName);
-  strcpy(node->name, newName);
+  strcpy(temp->lastName, newLastName);
+  strcpy(temp->name, newName);
   // Fill int
-  node->ci = newCI;
+  temp->ci = newCI;
   // Fill date
-  updateDate(&node->date, d, m, y);
+  updateDate(&temp->date, d, m, y);
   // Link to NULL
-  node->link = NULL;
+  temp->link = NULL;
 
-  return node;
+  if (head == NULL)
+  {
+    head = temp;
+  }
+  else
+  {
+    // Store the head in p for start the iteration
+    p = head;
+    // Iterate until locating a link set in NULL
+    while (p->link != NULL)
+      p = p->link;
+    // Store the temp into the p node
+    p->link = temp;
+  }
+
+  // TODO: Sort the list
+  return head;
 }
+
+/**
+ * * MAIN
+ */
 
 int main()
 {
   char lastName[CHAR_LENGTH], name[CHAR_LENGTH];
-  int opc, ci, day, month, year;
+  int opc, n = 0, ci, day, month, year;
 
   Node *head = NULL; // ** CREATING EMPTY LIST **
 
@@ -109,21 +133,22 @@ int main()
   {
     printf("\nEscriba el numero de una de las siguientes opciones:\n");
 
-    printf("1 - Agregar lista\n");
-    printf("2 - Modificar lista\n");
-    printf("3 - Buscar lista\n");
-    printf("4 - Borrar lista\n");
-    printf("5 - Mostrar Lista\n");
+    printf("1 - Agregar persona\n");
+    printf("2 - Modificar persona\n");
+    printf("3 - Buscar persona\n");
+    printf("4 - Borrar persona\n");
+    printf("5 - Mostrar lista de personas\n");
     printf("6 - Salir del programa\n");
 
     scanf("%d", &opc);
 
-    // TODO: Make all the methods and create the empty list
+    // TODO: Make all the functions in comments
     switch (opc)
     {
     case 1:
-      read(lastName, name, &ci, &day, &month, &year);
+      read(lastName, name, &ci, &day, &month, &year, n);
       head = addNode(head, lastName, name, ci, day, month, year);
+      n++;
       break;
 
     case 2:
