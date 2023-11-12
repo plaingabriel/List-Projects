@@ -35,11 +35,36 @@ typedef struct node
 } Node;
 
 /**
- * * READ FUNCTION
+ * * VAL POSITION
+ */
+
+int valPos(int n)
+{
+  int pos;
+
+  do
+  {
+    printf("Escriba la posicion de la persona dentro de la lista de %i elementos: ", n);
+    scanf("%i", &pos);
+
+    if (pos <= 0)
+    {
+      printf("La posicion ingresada es invalida. Por favor, intente de nuevo\n");
+    }
+
+  } while (pos <= 0 || pos > n);
+
+  return pos - 1; // Return position for use in loops
+}
+
+/**
+ * * READ
  */
 
 void read(char *newLastName, char *newName, int *ci, int *day, int *month, int *year)
 {
+  int val = 0;
+
   printf("Apellido: ");
   scanf("%s", newLastName);
 
@@ -49,20 +74,43 @@ void read(char *newLastName, char *newName, int *ci, int *day, int *month, int *
   printf("CI: ");
   scanf("%i", ci);
 
-  printf("Fecha de Nacimiento:\n");
+  do
+  {
+    printf("Fecha de nacimiento(Formato DD/MM/AAAA):\n");
+    scanf("%i/%i/%i", day, month, year);
 
-  printf("Dia: ");
-  scanf("%i", day);
+    if (*year >= 1900 && *year <= 2023)
+    {
+      // Check *month
+      if (*month >= 1 && *month <= 12)
+      {
+        // Check *days
+        if ((*day >= 1 && *day <= 31) && (*month == 1 || *month == 3 || *month == 5 || *month == 7 || *month == 8 || *month == 10 || *month == 12))
+          val = 1;
+        else if ((*day >= 1 && *day <= 30) && (*month == 4 || *month == 6 || *month == 9 || *month == 11))
+          val = 1;
+        else if ((*day >= 1 && *day <= 28) && (*month == 2))
+          val = 1;
+        else if (*day == 29 && *month == 2 && (*year % 400 == 0 || (*year % 4 == 0 && *year % 100 != 0)))
+          val = 1;
+        else
+          printf("Dia invalido.\n");
+      }
+      else
+      {
+        printf("Mes invalido.\n");
+      }
+    }
+    else
+    {
+      printf("Anio invalido.\n");
+    }
 
-  printf("Mes: ");
-  scanf("%i", month);
-
-  printf("Anio: ");
-  scanf("%i", year);
+  } while (val != 1);
 }
 
 /**
- * * SHOW FUNCTIONS
+ * * SHOW LIST
  */
 
 void showList(Node *head)
@@ -72,20 +120,24 @@ void showList(Node *head)
   else
   {
     int i = 0;
-    // TODO: Fix the table
-    printf("Nro | Apellido\t\t\t\t| Nombre \t\t\t\t| CI \t\t\t\t| Fecha de Nacimiento\n");
+    printf("\n\nNro | Apellido\t\t\t\t | Nombre \t\t\t | CI \t\t\t| Fecha de Nacimiento\n");
     // Iterate until the node is NULL
     for (Node *p = head; p != NULL; p = p->link, i++)
-      printf("%i | %s \t\t\t\t| %s \t\t\t\t| %d \t\t\t\t| %d/%d/%d\n", i + 1, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
+      printf("%i  | %s \t\t\t\t| %s \t\t\t\t| %d \t\t\t| %d/%d/%d\n", i + 1, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
+    printf("\n");
   }
 }
+
+/**
+ * * SHOW ELEMENT
+ */
 
 void showElement(Node *p, int val, int i)
 {
   if (val == 1)
-    printf("Nro | Apellido\t\t\t\t| Nombre \t\t\t\t| CI \t\t\t\t| Fecha de Nacimiento\n");
+    printf("\n\nNro | Apellido\t\t\t\t | Nombre \t\t\t | CI \t\t\t| Fecha de Nacimiento\n");
 
-  printf("%i | %s \t\t\t\t| %s \t\t\t\t| %d \t\t\t\t| %d/%d/%d\n", i, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
+  printf("%i  | %s \t\t\t\t | %s \t\t\t\t | %d \t\t\t\t | %d/%d/%d\n", i, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
 }
 
 /**
@@ -282,49 +334,26 @@ void searchElement(Node *head, char *str)
       // Print the list of matches like a table
       showElement(current, val, index);
     }
+    // Pass to the next node
+    current = current->link;
   }
-  // Pass to the next node
-  current = current->link;
+
+  if (index == 0)
+    printf("Persona no encontrada\n");
 }
 
 /**
  * * SEARCH MENU
  */
 
-Node *searchMenu(Node *head)
+void searchMenu(Node *head)
 {
   char charSearch[CHAR_LENGTH];
   int opc;
-  printf("Escriba el nombre o el apellido de la persona que desea buscar:");
+  printf("Escriba el nombre o el apellido de la persona que desea buscar: ");
   scanf("%s", charSearch);
 
   searchElement(head, charSearch);
-  printf("Persona no encontrada\n");
-
-  return head;
-}
-
-/**
- * * VAL POSITION
- */
-
-int valPos(int n)
-{
-  int pos;
-
-  do
-  {
-    printf("Escriba la posicion de la persona dentro de la lista de %i elementos: ", n);
-    scanf("%i", &pos);
-
-    if (pos <= 0)
-    {
-      printf("La posicion ingresada es invalida. Por favor, intente de nuevo\n");
-    }
-
-  } while (pos <= 0 || pos > n);
-
-  return pos - 1;
 }
 
 /**
@@ -335,7 +364,7 @@ int main()
 {
   int opc, n = 0;
 
-  Node *head = NULL; // ** CREATING EMPTY LIST **
+  Node *head = NULL; // ** Creating empty list **
 
   /**
    * * MENU
