@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <conio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -110,8 +109,64 @@ Node *addNode(Node *head, char *newLastName, char *newName, int newCI, int d, in
     p->link = temp;
   }
 
-  // TODO: Sort the list
   return head;
+}
+
+/**
+ * * SORT LIST
+ */
+
+void sortList(Node *head)
+{
+  Node *node = NULL, *temp = NULL;
+  char tempName[CHAR_LENGTH], tempLastName[CHAR_LENGTH]; // Temp variables to store node names and last names
+  int tempCI;                                            // Temp variable to store CI
+  BirthDate tempDate;                                    // Temp variable to store date
+
+  node = head;
+
+  while (node != NULL)
+  {
+    temp = node;
+    while (temp->link != NULL) // Travel till the second last element
+    {
+      int comp = strcmp(temp->lastName, temp->link->lastName);
+      if (comp > 0 || strcmp(temp->name, temp->link->name) > 0 && comp == 0) // Compare the last names or the names of the nodes
+      {
+        // Copy the data inside the temp variables
+
+        strcpy(tempLastName, temp->lastName);
+        strcpy(tempName, temp->name);
+
+        tempCI = temp->ci;
+
+        tempDate.day = temp->date.day;
+        tempDate.month = temp->date.month;
+        tempDate.year = temp->date.year;
+
+        // Swap the data
+
+        strcpy(temp->lastName, temp->link->lastName);
+        strcpy(temp->name, temp->link->name);
+
+        temp->ci = temp->link->ci;
+
+        temp->date.day = temp->link->date.day;
+        temp->date.month = temp->link->date.month;
+        temp->date.year = temp->link->date.year;
+
+        strcpy(temp->link->lastName, tempLastName);
+        strcpy(temp->link->name, tempName);
+
+        temp->link->ci = tempCI;
+        temp->link->date.day = tempDate.day;
+        temp->link->date.month = tempDate.month;
+        temp->link->date.year = tempDate.year;
+      }
+      temp = temp->link; // Move to the next element
+    }
+    node = node->link; // Move to the next node
+  }
 }
 
 /**
@@ -148,6 +203,8 @@ int main()
     case 1:
       read(lastName, name, &ci, &day, &month, &year, n);
       head = addNode(head, lastName, name, ci, day, month, year);
+      // TODO: Sort the list
+      sortList(head);
       n++;
       break;
 
