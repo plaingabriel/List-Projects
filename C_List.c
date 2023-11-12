@@ -67,12 +67,17 @@ void read(char *newLastName, char *newName, int *ci, int *day, int *month, int *
 
 void showList(Node *head)
 {
-  int i = 0;
-  // TODO: Fix the table
-  printf("Nro | Apellido\t\t\t\t| Nombre \t\t\t\t| CI \t\t\t\t| Fecha de Nacimiento\n");
-  // Iterate until the node is NULL
-  for (Node *p = head; p != NULL; p = p->link, i++)
-    printf("%i | %s \t\t\t\t| %s \t\t\t\t| %d \t\t\t\t| %d/%d/%d\n", i + 1, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
+  if (head == NULL)
+    printf("La lista se encuentra vacia\n");
+  else
+  {
+    int i = 0;
+    // TODO: Fix the table
+    printf("Nro | Apellido\t\t\t\t| Nombre \t\t\t\t| CI \t\t\t\t| Fecha de Nacimiento\n");
+    // Iterate until the node is NULL
+    for (Node *p = head; p != NULL; p = p->link, i++)
+      printf("%i | %s \t\t\t\t| %s \t\t\t\t| %d \t\t\t\t| %d/%d/%d\n", i + 1, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
+  }
 }
 
 void showElement(Node *p, int val, int i)
@@ -131,6 +136,63 @@ void copyVariables(Node *node, char *newLastName, char *newName, int *ci, int *d
   *day = node->date.day;
   *month = node->date.month;
   *year = node->date.year;
+}
+
+/**
+ * * MODIFY PERSON
+ */
+
+void modifyPerson(Node *head, int pos)
+{
+  Node *previous = head, *current = head;
+  // Loop until be on the position
+  while (pos != 0)
+  {
+    previous = current;
+    current = current->link;
+    pos--;
+  }
+
+  fillPerson(current);
+}
+
+/**
+ * * REMOVE PERSON
+ */
+
+void removePerson(Node **head, int pos)
+{
+  Node *previous = *head, *current = *head; // head pointing to the original head
+
+  if (head == NULL)
+    printf("La lista se encuentra vacia\n");
+  else if (pos == 0)
+  {
+    *head = current->link;
+    free(current);
+    current = NULL;
+  }
+  else
+  {
+    while (pos != 0)
+    {
+      previous = current;
+      current = current->link;
+      pos--;
+    }
+    if (current == NULL)
+    {
+      previous->link = NULL;
+      free(current);
+      current = NULL;
+    }
+    else
+    {
+      previous->link = current->link;
+      free(current);
+      current = NULL;
+    }
+  }
 }
 
 /**
@@ -206,9 +268,9 @@ Node *addNode(Node *head)
  * * SEARCH PERSON
  */
 
-int searchElement(Node *head, char *str, int opc)
+void searchElement(Node *head, char *str)
 {
-  Node *current = head, *searchedNode = NULL; // Initialize current
+  Node *current = head; // Initialize current
   int index = 0, val = 0;
   // Traverse till then end of the linked list
   while (current != NULL)
@@ -217,29 +279,12 @@ int searchElement(Node *head, char *str, int opc)
     {
       index++;
       val++;
-
-      switch (opc)
-      {
-      case 0:
-        // Show element
-        showElement(current, val, index);
-        break;
-
-      case 1:
-        // Modify the atrributes of the person without change the link
-        fillPerson(current);
-        break;
-
-      case 2:
-        // Remove
-        break;
-      }
+      // Print the list of matches like a table
+      showElement(current, val, index);
     }
-
-    // Pass to the next node
-    current = current->link;
   }
-  return index;
+  // Pass to the next node
+  current = current->link;
 }
 
 /**
@@ -253,44 +298,33 @@ Node *searchMenu(Node *head)
   printf("Escriba el nombre o el apellido de la persona que desea buscar:");
   scanf("%s", charSearch);
 
-  if (searchElement(head, charSearch, 0) > 0)
-  {
-    do
-    {
-      printf("\nEscriba el numero de una de las siguientes opciones:\n");
-
-      printf("1 - Modificar persona\n");
-      printf("2 - Borrar persona\n");
-      printf("3 - Salir del menu\n");
-
-      scanf("%d", &opc);
-
-      switch (opc)
-      {
-      case 1:
-        char modifySearch[CHAR_LENGTH];
-        printf("Escriba el nombre o el apellido de la persona que desea modificar: ");
-        scanf("%s", modifySearch);
-
-        searchElement(head, modifySearch, 1);
-        break;
-
-      case 2:
-        /* Remove */
-        break;
-
-      case 3:
-        printf("Saliendo del programa...\n");
-      default:
-        printf("La opcion seleccionada es invalida. Por favor, intente de nuevo\n");
-        break;
-      }
-    } while (opc != 3);
-  }
-  else
-    printf("Persona no encontrada\n");
+  searchElement(head, charSearch);
+  printf("Persona no encontrada\n");
 
   return head;
+}
+
+/**
+ * * VAL POSITION
+ */
+
+int valPos(int n)
+{
+  int pos;
+
+  do
+  {
+    printf("Escriba la posicion de la persona dentro de la lista de %i elementos: ", n);
+    scanf("%i", &pos);
+
+    if (pos <= 0)
+    {
+      printf("La posicion ingresada es invalida. Por favor, intente de nuevo\n");
+    }
+
+  } while (pos <= 0 || pos > n);
+
+  return pos - 1;
 }
 
 /**
@@ -299,7 +333,7 @@ Node *searchMenu(Node *head)
 
 int main()
 {
-  int opc;
+  int opc, n = 0;
 
   Node *head = NULL; // ** CREATING EMPTY LIST **
 
@@ -309,12 +343,15 @@ int main()
 
   do
   {
+    int pos;
     printf("\nEscriba el numero de una de las siguientes opciones:\n");
 
     printf("1 - Agregar persona\n");
     printf("2 - Buscar persona\n");
-    printf("3 - Mostrar lista de personas\n");
-    printf("4 - Salir del programa\n");
+    printf("3 - Modificar persona\n");
+    printf("4 - Borrar persona\n");
+    printf("5 - Mostrar lista de personas\n");
+    printf("6 - Salir del programa\n");
 
     scanf("%d", &opc);
 
@@ -323,6 +360,7 @@ int main()
     {
     case 1:
       head = addNode(head);
+      n++;
       break;
 
     case 2:
@@ -330,10 +368,21 @@ int main()
       break;
 
     case 3:
-      showList(head);
+      pos = valPos(n);
+      modifyPerson(head, pos);
       break;
 
     case 4:
+      pos = valPos(n);
+      removePerson(&head, pos);
+      n--;
+      break;
+
+    case 5:
+      showList(head);
+      break;
+
+    case 6:
       printf("Cerrando el programa...\n");
       break;
 
@@ -341,7 +390,7 @@ int main()
       printf("La opcion seleccionada es invalida. Intente de nuevo\n");
       break;
     }
-  } while (opc != 4);
+  } while (opc != 6);
 
   /**
    * * END OF MENU
