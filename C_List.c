@@ -38,9 +38,8 @@ typedef struct node
  * * READ FUNCTION
  */
 
-void read(char *newLastName, char *newName, int *ci, int *day, int *month, int *year, int n)
+void read(char *newLastName, char *newName, int *ci, int *day, int *month, int *year)
 {
-  printf("\nPersona nro %i:\n", n + 1);
   printf("Apellido: ");
   scanf("%s", newLastName);
 
@@ -63,34 +62,123 @@ void read(char *newLastName, char *newName, int *ci, int *day, int *month, int *
 }
 
 /**
- * * SHOW FUNCTION
+ * * SHOW FUNCTIONS
  */
 
-void show(Node *head)
+void showList(Node *head)
 {
+  int i = 0;
   // TODO: Fix the table
-  printf("Apellido\t\t\t\t| Nombre \t\t\t\t| CI \t\t\t\t| Fecha de Nacimiento\n");
+  printf("Nro | Apellido\t\t\t\t| Nombre \t\t\t\t| CI \t\t\t\t| Fecha de Nacimiento\n");
   // Iterate until the node is NULL
-  for (Node *p = head; p != NULL; p = p->link)
-    printf("%s \t\t\t\t| %s \t\t\t\t| %d \t\t\t\t| %d/%d/%d\n", p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
+  for (Node *p = head; p != NULL; p = p->link, i++)
+    printf("%i | %s \t\t\t\t| %s \t\t\t\t| %d \t\t\t\t| %d/%d/%d\n", i + 1, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
+}
+
+void showElement(Node *p, int val, int i)
+{
+  if (val == 1)
+    printf("Nro | Apellido\t\t\t\t| Nombre \t\t\t\t| CI \t\t\t\t| Fecha de Nacimiento\n");
+
+  printf("%i | %s \t\t\t\t| %s \t\t\t\t| %d \t\t\t\t| %d/%d/%d\n", i, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
 }
 
 /**
- * * ADD NODE FUNCTION
+ * * FILL PERSON
  */
 
-Node *addNode(Node *head, char *newLastName, char *newName, int newCI, int d, int m, int y)
+void fillPerson(Node *node)
+{
+  char lastName[CHAR_LENGTH], name[CHAR_LENGTH];
+  int opc, ci, day, month, year;
+  // Read attributes
+  read(lastName, name, &ci, &day, &month, &year);
+  // Fill char
+  strcpy(node->lastName, lastName);
+  strcpy(node->name, name);
+  // Fill int
+  node->ci = ci;
+  // Fill date
+  updateDate(&node->date, day, month, year);
+}
+
+/**
+ * * COPY PERSON
+ */
+
+void copyPerson(Node *node, char *lastName, char *name, int ci, int day, int month, int year)
+{
+  // Fill char
+  strcpy(node->lastName, lastName);
+  strcpy(node->name, name);
+  // Fill int
+  node->ci = ci;
+  // Fill date
+  updateDate(&node->date, day, month, year);
+}
+
+/**
+ * * COPY VARIABLES
+ */
+
+void copyVariables(Node *node, char *newLastName, char *newName, int *ci, int *day, int *month, int *year)
+{
+  strcpy(newLastName, node->lastName);
+  strcpy(newName, node->name);
+
+  *ci = node->ci;
+
+  *day = node->date.day;
+  *month = node->date.month;
+  *year = node->date.year;
+}
+
+/**
+ * * SORT LIST
+ */
+
+void sortList(Node *head)
+{
+  Node *node = NULL, *temp = NULL;
+  char tempName[CHAR_LENGTH], tempLastName[CHAR_LENGTH]; // Temp variables to store node names and last names
+  int tempCI, tempDay, tempMonth, tempYear;              // Temp variable to store int values
+
+  node = head;
+
+  while (node != NULL)
+  {
+    temp = node;
+    while (temp->link != NULL) // Travel till the second last element
+    {
+      int comp = strcmp(temp->lastName, temp->link->lastName);
+      if (comp > 0 || strcmp(temp->name, temp->link->name) > 0 && comp == 0) // Compare the last names or the names of the nodes
+      {
+        // Copy the data inside the temp variables
+        copyVariables(temp, tempLastName, tempName, &tempCI, &tempDay, &tempMonth, &tempYear);
+
+        // Swap the data
+
+        copyPerson(temp, temp->link->lastName, temp->link->name, temp->link->ci, temp->link->date.day, temp->link->date.month, temp->link->date.year);
+
+        copyPerson(temp->link, tempLastName, tempName, tempCI, tempDay, tempMonth, tempYear);
+      }
+      temp = temp->link; // Move to the next element
+    }
+    node = node->link; // Move to the next node
+  }
+}
+
+/**
+ * * ADD NODE
+ */
+
+Node *addNode(Node *head)
 {
   Node *temp = NULL, *p = NULL;
   // Sizing node
   temp = (Node *)malloc(sizeof(Node));
-  // Fill char
-  strcpy(temp->lastName, newLastName);
-  strcpy(temp->name, newName);
-  // Fill int
-  temp->ci = newCI;
-  // Fill date
-  updateDate(&temp->date, d, m, y);
+  // Filling the attributes
+  fillPerson(temp);
   // Link to NULL
   temp->link = NULL;
 
@@ -109,64 +197,100 @@ Node *addNode(Node *head, char *newLastName, char *newName, int newCI, int d, in
     p->link = temp;
   }
 
+  sortList(head);
+
   return head;
 }
 
 /**
- * * SORT LIST
+ * * SEARCH PERSON
  */
 
-void sortList(Node *head)
+int searchElement(Node *head, char *str, int opc)
 {
-  Node *node = NULL, *temp = NULL;
-  char tempName[CHAR_LENGTH], tempLastName[CHAR_LENGTH]; // Temp variables to store node names and last names
-  int tempCI;                                            // Temp variable to store CI
-  BirthDate tempDate;                                    // Temp variable to store date
-
-  node = head;
-
-  while (node != NULL)
+  Node *current = head, *searchedNode = NULL; // Initialize current
+  int index = 0, val = 0;
+  // Traverse till then end of the linked list
+  while (current != NULL)
   {
-    temp = node;
-    while (temp->link != NULL) // Travel till the second last element
+    if (strcmp(current->lastName, str) == 0 || strcmp(current->name, str) == 0)
     {
-      int comp = strcmp(temp->lastName, temp->link->lastName);
-      if (comp > 0 || strcmp(temp->name, temp->link->name) > 0 && comp == 0) // Compare the last names or the names of the nodes
+      index++;
+      val++;
+
+      switch (opc)
       {
-        // Copy the data inside the temp variables
+      case 0:
+        // Show element
+        showElement(current, val, index);
+        break;
 
-        strcpy(tempLastName, temp->lastName);
-        strcpy(tempName, temp->name);
+      case 1:
+        // Modify the atrributes of the person without change the link
+        fillPerson(current);
+        break;
 
-        tempCI = temp->ci;
-
-        tempDate.day = temp->date.day;
-        tempDate.month = temp->date.month;
-        tempDate.year = temp->date.year;
-
-        // Swap the data
-
-        strcpy(temp->lastName, temp->link->lastName);
-        strcpy(temp->name, temp->link->name);
-
-        temp->ci = temp->link->ci;
-
-        temp->date.day = temp->link->date.day;
-        temp->date.month = temp->link->date.month;
-        temp->date.year = temp->link->date.year;
-
-        strcpy(temp->link->lastName, tempLastName);
-        strcpy(temp->link->name, tempName);
-
-        temp->link->ci = tempCI;
-        temp->link->date.day = tempDate.day;
-        temp->link->date.month = tempDate.month;
-        temp->link->date.year = tempDate.year;
+      case 2:
+        // Remove
+        break;
       }
-      temp = temp->link; // Move to the next element
     }
-    node = node->link; // Move to the next node
+
+    // Pass to the next node
+    current = current->link;
   }
+  return index;
+}
+
+/**
+ * * SEARCH MENU
+ */
+
+Node *searchMenu(Node *head)
+{
+  char charSearch[CHAR_LENGTH];
+  int opc;
+  printf("Escriba el nombre o el apellido de la persona que desea buscar:");
+  scanf("%s", charSearch);
+
+  if (searchElement(head, charSearch, 0) > 0)
+  {
+    do
+    {
+      printf("\nEscriba el numero de una de las siguientes opciones:\n");
+
+      printf("1 - Modificar persona\n");
+      printf("2 - Borrar persona\n");
+      printf("3 - Salir del menu\n");
+
+      scanf("%d", &opc);
+
+      switch (opc)
+      {
+      case 1:
+        char modifySearch[CHAR_LENGTH];
+        printf("Escriba el nombre o el apellido de la persona que desea modificar: ");
+        scanf("%s", modifySearch);
+
+        searchElement(head, modifySearch, 1);
+        break;
+
+      case 2:
+        /* Remove */
+        break;
+
+      case 3:
+        printf("Saliendo del programa...\n");
+      default:
+        printf("La opcion seleccionada es invalida. Por favor, intente de nuevo\n");
+        break;
+      }
+    } while (opc != 3);
+  }
+  else
+    printf("Persona no encontrada\n");
+
+  return head;
 }
 
 /**
@@ -175,8 +299,7 @@ void sortList(Node *head)
 
 int main()
 {
-  char lastName[CHAR_LENGTH], name[CHAR_LENGTH];
-  int opc, n = 0, ci, day, month, year;
+  int opc;
 
   Node *head = NULL; // ** CREATING EMPTY LIST **
 
@@ -189,11 +312,9 @@ int main()
     printf("\nEscriba el numero de una de las siguientes opciones:\n");
 
     printf("1 - Agregar persona\n");
-    printf("2 - Modificar persona\n");
-    printf("3 - Buscar persona\n");
-    printf("4 - Borrar persona\n");
-    printf("5 - Mostrar lista de personas\n");
-    printf("6 - Salir del programa\n");
+    printf("2 - Buscar persona\n");
+    printf("3 - Mostrar lista de personas\n");
+    printf("4 - Salir del programa\n");
 
     scanf("%d", &opc);
 
@@ -201,30 +322,18 @@ int main()
     switch (opc)
     {
     case 1:
-      read(lastName, name, &ci, &day, &month, &year, n);
-      head = addNode(head, lastName, name, ci, day, month, year);
-      // TODO: Sort the list
-      sortList(head);
-      n++;
+      head = addNode(head);
       break;
 
     case 2:
-      /* Modify */
+      searchMenu(head);
       break;
 
     case 3:
-      /* Search */
+      showList(head);
       break;
 
     case 4:
-      /* Remove */
-      break;
-
-    case 5:
-      show(head);
-      break;
-
-    case 6:
       printf("Cerrando el programa...\n");
       break;
 
@@ -232,7 +341,7 @@ int main()
       printf("La opcion seleccionada es invalida. Intente de nuevo\n");
       break;
     }
-  } while (opc != 6);
+  } while (opc != 4);
 
   /**
    * * END OF MENU
