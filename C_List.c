@@ -58,6 +58,20 @@ int valPos(int n)
 }
 
 /**
+ * * VALIDATE NODE
+ */
+
+int valNode(Node *head)
+{
+  if (head == NULL)
+  {
+    printf("La lista se encuentra vacia\n");
+    return 0;
+  }
+  return 1;
+}
+
+/**
  * * READ
  */
 
@@ -115,17 +129,12 @@ void read(char *newLastName, char *newName, int *ci, int *day, int *month, int *
 
 void showList(Node *head)
 {
-  if (head == NULL)
-    printf("La lista se encuentra vacia\n");
-  else
-  {
-    int i = 0;
-    printf("\n\nNro | Apellido\t\t\t\t | Nombre \t\t\t | CI \t\t\t| Fecha de Nacimiento\n");
-    // Iterate until the node is NULL
-    for (Node *p = head; p != NULL; p = p->link, i++)
-      printf("%i  | %s \t\t\t\t| %s \t\t\t\t| %d \t\t\t| %d/%d/%d\n", i + 1, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
-    printf("\n");
-  }
+  int i = 0;
+  printf("\n\n N.| Apellido        | Nombre          | CI         | Fecha de Nacimiento\n");
+  // Iterate until the node is NULL
+  for (Node *p = head; p != NULL; p = p->link, i++)
+    printf("%2d | %-15s | %-15s | %-10d | %2d/%2d/%2d\n", i + 1, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
+  printf("\n");
 }
 
 /**
@@ -135,9 +144,9 @@ void showList(Node *head)
 void showElement(Node *p, int val, int i)
 {
   if (val == 1)
-    printf("\n\nNro | Apellido\t\t\t\t | Nombre \t\t\t | CI \t\t\t| Fecha de Nacimiento\n");
+    printf("\n\n N.| Apellido        | Nombre          | CI         | Fecha de Nacimiento\n");
 
-  printf("%i  | %s \t\t\t\t | %s \t\t\t\t | %d \t\t\t\t | %d/%d/%d\n", i, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
+  printf("%2d | %-15s | %-15s | %-10d | %2d/%2d/%2d\n", i + 1, p->lastName, p->name, p->ci, p->date.day, p->date.month, p->date.year);
 }
 
 /**
@@ -393,22 +402,33 @@ int main()
       break;
 
     case 2:
-      searchMenu(head);
+      if (valNode(head) == 1)
+      {
+        searchMenu(head);
+      }
       break;
 
     case 3:
-      pos = valPos(n);
-      modifyPerson(head, pos);
+      if (valNode(head) == 1)
+      {
+        pos = valPos(n);
+        modifyPerson(head, pos);
+      }
       break;
 
     case 4:
-      pos = valPos(n);
-      removePerson(&head, pos);
-      n--;
+      if (valNode(head) == 1)
+      {
+        pos = valPos(n);
+        removePerson(&head, pos);
+        n--;
+      }
+
       break;
 
     case 5:
-      showList(head);
+      if (valNode(head) == 1)
+        showList(head);
       break;
 
     case 6:
