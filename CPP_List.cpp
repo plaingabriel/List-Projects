@@ -101,6 +101,9 @@ public:
   // Sort List
   void sortList();
 
+  // Fill person
+  void fillPerson(Node *node);
+
   // Add person
   void addPerson();
 
@@ -119,10 +122,10 @@ public:
   // TODO:
 
   // Modify person
-  void modifyPerson();
+  void modifyPerson(int pos);
 
   // Remove person
-  void removePerson();
+  void removePerson(int pos);
 };
 
 /**
@@ -281,6 +284,25 @@ void LinkedList::sortList()
 }
 
 /**
+ * * FILL PERSON
+ */
+
+void LinkedList::fillPerson(Node *node)
+{
+  string lastName, name;
+  int opc, ci, day, month, year;
+  // Read attributes
+  read(lastName, name, &ci, &day, &month, &year);
+  // Fill char
+  node->lastName = lastName;
+  node->name = name;
+  // Fill int
+  node->ci = ci;
+  // Fill date
+  node->date.setDate(day, month, year);
+}
+
+/**
  * * ADD PERSON
  */
 
@@ -351,13 +373,25 @@ void LinkedList::searchMenu()
  * * MODIFY PERSON
  */
 
-void LinkedList::modifyPerson() {}
+void LinkedList::modifyPerson(int pos)
+{
+  Node *previous = head, *current = head;
+  // Loop until be on the position
+  while (pos != 0)
+  {
+    previous = current;
+    current = current->link;
+    pos--;
+  }
+
+  fillPerson(current);
+}
 
 /**
  * * REMOVE PERSON
  */
 
-void LinkedList::removePerson() {}
+void LinkedList::removePerson(int pos) {}
 
 /**
  * * SHOW LIST
@@ -435,7 +469,7 @@ int main(int argc, char const *argv[])
       if (list.valList() == 1)
       {
         pos = list.valPos(n);
-        list.modifyPerson();
+        list.modifyPerson(pos);
       }
       break;
 
@@ -443,7 +477,7 @@ int main(int argc, char const *argv[])
       if (list.valList() == 1)
       {
         pos = list.valPos(n);
-        list.removePerson();
+        list.removePerson(pos);
         n--;
       }
       break;
