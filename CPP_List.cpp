@@ -9,81 +9,6 @@
 using namespace std;
 
 /**
- * * READ
- */
-
-void read(string &newLastName, string &newName, int *ci, int *day, int *month, int *year)
-{
-  int val = 0;
-
-  printf("Apellido: ");
-  cin >> newLastName;
-
-  printf("Nombre: ");
-  cin >> newName;
-
-  printf("CI: ");
-  scanf("%i", ci);
-
-  do
-  {
-    printf("Fecha de nacimiento(Formato DD/MM/AAAA):\n");
-    scanf("%i/%i/%i", day, month, year);
-
-    if (*year >= 1900 && *year <= 2023)
-    {
-      // Check *month
-      if (*month >= 1 && *month <= 12)
-      {
-        // Check *days
-        if ((*day >= 1 && *day <= 31) && (*month == 1 || *month == 3 || *month == 5 || *month == 7 || *month == 8 || *month == 10 || *month == 12))
-          val = 1;
-        else if ((*day >= 1 && *day <= 30) && (*month == 4 || *month == 6 || *month == 9 || *month == 11))
-          val = 1;
-        else if ((*day >= 1 && *day <= 28) && (*month == 2))
-          val = 1;
-        else if (*day == 29 && *month == 2 && (*year % 400 == 0 || (*year % 4 == 0 && *year % 100 != 0)))
-          val = 1;
-        else
-          printf("Dia invalido.\n");
-      }
-      else
-      {
-        printf("Mes invalido.\n");
-      }
-    }
-    else
-    {
-      printf("Anio invalido.\n");
-    }
-
-  } while (val != 1);
-}
-
-/**
- * * VAL POSITION
- */
-
-int valPos(int n)
-{
-  int pos;
-
-  do
-  {
-    printf("Escriba la posicion de la persona dentro de la lista de %i elementos: ", n);
-    scanf("%i", &pos);
-
-    if (pos <= 0)
-    {
-      printf("La posicion ingresada es invalida. Por favor, intente de nuevo\n");
-    }
-
-  } while (pos <= 0 || pos > n);
-
-  return pos - 1; // Return position for use in loops
-}
-
-/**
  * * BIRTH DATE
  */
 
@@ -158,25 +83,122 @@ public:
   {
     head = NULL;
   }
+  // Read
+  void read(string &newLastName, string &newName, int *ci, int *day, int *month, int *year);
+
+  // Val Position
+  int valPos(int n);
+
   // Validate list
   int valList();
+
   // Store attributes inside temp variables
   void copyVariables(Node *node, string &newLastName, string &newName, int *ci, int *day, int *month, int *year);
+
   // Store the data inside node attributes
   void copyPerson(Node *node, string &lastName, string &name, int ci, int day, int month, int year);
+
   // Sort List
   void sortList();
+
   // Add person
   void addPerson();
+
   // Search person
-  void searchPerson();
-  // Modify person
-  void modifyPerson();
-  // Remove person
-  void removePerson();
+  void searchPerson(string &str);
+
+  // Search menu
+  void searchMenu();
+
   // Show linked list
   void showList();
+
+  // Show individual node
+  void showPerson(Node *p, int val, int i);
+
+  // TODO:
+
+  // Modify person
+  void modifyPerson();
+
+  // Remove person
+  void removePerson();
 };
+
+/**
+ * * READ
+ */
+
+void LinkedList::read(string &newLastName, string &newName, int *ci, int *day, int *month, int *year)
+{
+  int val = 0;
+
+  printf("Apellido: ");
+  cin >> newLastName;
+
+  printf("Nombre: ");
+  cin >> newName;
+
+  printf("CI: ");
+  scanf("%i", ci);
+
+  do
+  {
+    printf("Fecha de nacimiento(Formato DD/MM/AAAA):\n");
+    scanf("%i/%i/%i", day, month, year);
+
+    if (*year >= 1900 && *year <= 2023)
+    {
+      // Check *month
+      if (*month >= 1 && *month <= 12)
+      {
+        // Check *days
+        if ((*day >= 1 && *day <= 31) && (*month == 1 || *month == 3 || *month == 5 || *month == 7 || *month == 8 || *month == 10 || *month == 12))
+          val = 1;
+        else if ((*day >= 1 && *day <= 30) && (*month == 4 || *month == 6 || *month == 9 || *month == 11))
+          val = 1;
+        else if ((*day >= 1 && *day <= 28) && (*month == 2))
+          val = 1;
+        else if (*day == 29 && *month == 2 && (*year % 400 == 0 || (*year % 4 == 0 && *year % 100 != 0)))
+          val = 1;
+        else
+          printf("Dia invalido.\n");
+      }
+      else
+      {
+        printf("Mes invalido.\n");
+      }
+    }
+    else
+    {
+      printf("Anio invalido.\n");
+    }
+
+  } while (val != 1);
+}
+
+/**
+ * * VAL POSITION
+ */
+
+int LinkedList::valPos(int n)
+{
+  int pos;
+
+  do
+  {
+    printf("Escriba la posicion de la persona dentro de la lista de %i elementos: ", n);
+    scanf("%i", &pos);
+
+    if (pos <= 0)
+    {
+      printf("La posicion ingresada es invalida. Por favor, intente de nuevo\n");
+    }
+
+  } while (pos <= 0 || pos > n);
+
+  return pos - 1; // Return position for use in loops
+}
 
 /**
  * * VALIDATE LIST
@@ -289,7 +311,41 @@ void LinkedList::addPerson()
  * * SEARCH PERSON
  */
 
-void LinkedList::searchPerson() {}
+void LinkedList::searchPerson(string &str)
+{
+  Node *current = head; // Initialize current
+  int index = 0, val = 0;
+  // Traverse till then end of the linked list
+  while (current != NULL)
+  {
+    if (current->lastName.compare(str) == 0 || current->name.compare(str) == 0)
+    {
+      index++;
+      val++;
+      // Print the list of matches like a table
+      showPerson(current, val, index - 1); // Store the positions from 0 with index - 1
+    }
+    // Pass to the next node
+    current = current->link;
+  }
+
+  if (index == 0)
+    printf("Persona no encontrada\n");
+}
+
+/**
+ * * SEARCH MENU
+ */
+
+void LinkedList::searchMenu()
+{
+  string search;
+  int opc;
+  printf("Escriba el nombre o el apellido de la persona que desea buscar: ");
+  cin >> search;
+
+  searchPerson(search);
+}
 
 /**
  * * MODIFY PERSON
@@ -315,6 +371,18 @@ void LinkedList::showList()
   for (Node *p = head; p != NULL; p = p->link, i++)
     printf("%2d | %-15s | %-15s | %-10d | %2d/%2d/%2d\n", i + 1, p->lastName.c_str(), p->name.c_str(), p->ci, p->date.day, p->date.month, p->date.year);
   printf("\n");
+}
+
+/**
+ * * SHOW PERSON
+ */
+
+void LinkedList::showPerson(Node *p, int val, int i)
+{
+  if (val == 1)
+    printf("\n\n N.| Apellido        | Nombre          | CI         | Fecha de Nacimiento\n");
+
+  printf("%2d | %-15s | %-15s | %-10d | %2d/%2d/%2d\n", i + 1, p->lastName.c_str(), p->name.c_str(), p->ci, p->date.day, p->date.month, p->date.year);
 }
 
 /**
@@ -359,14 +427,14 @@ int main(int argc, char const *argv[])
     case 2:
       if (list.valList() == 1)
       {
-        list.searchPerson();
+        list.searchMenu();
       }
       break;
 
     case 3:
       if (list.valList() == 1)
       {
-        pos = valPos(n);
+        pos = list.valPos(n);
         list.modifyPerson();
       }
       break;
@@ -374,7 +442,7 @@ int main(int argc, char const *argv[])
     case 4:
       if (list.valList() == 1)
       {
-        pos = valPos(n);
+        pos = list.valPos(n);
         list.removePerson();
         n--;
       }

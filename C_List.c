@@ -398,7 +398,6 @@ int main()
 
     scanf("%d", &opc);
 
-    // TODO: Make all the functions in comments
     switch (opc)
     {
     case 1:
