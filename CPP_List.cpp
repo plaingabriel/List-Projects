@@ -119,8 +119,6 @@ public:
   // Show individual node
   void showPerson(Node *p, int val, int i);
 
-  // TODO:
-
   // Modify person
   void modifyPerson(int pos);
 
@@ -391,7 +389,38 @@ void LinkedList::modifyPerson(int pos)
  * * REMOVE PERSON
  */
 
-void LinkedList::removePerson(int pos) {}
+void LinkedList::removePerson(int pos)
+{
+  Node *current = head, *previous = NULL;
+
+  // Declare temp1
+  current = head;
+
+  // Case: Delete head.
+  if (pos == 0)
+  {
+    // Update head
+    head = head->link;
+    delete current;
+    return;
+  }
+
+  // Search the node to be deleted
+  while (pos-- > 0)
+  {
+    // Update previous
+    previous = current;
+
+    // Update current
+    current = current->link;
+  }
+
+  // Change the next pointer of the previous node
+  previous->link = current->link;
+
+  // Delete the node
+  delete current;
+}
 
 /**
  * * SHOW LIST
@@ -447,32 +476,34 @@ int main(int argc, char const *argv[])
 
     scanf("%d", &opc);
 
-    // TODO: Make all the functions in comments
     switch (opc)
     {
+    // Add and sort
     case 1:
-      // Add and sort
       list.addPerson();
       if (n > 0)
         list.sortList();
       n++;
       break;
-
+    // Search
     case 2:
       if (list.valList() == 1)
       {
         list.searchMenu();
       }
       break;
-
+    // Modify and sort
     case 3:
       if (list.valList() == 1)
       {
         pos = list.valPos(n);
         list.modifyPerson(pos);
+
+        if (n > 1)
+          list.sortList();
       }
       break;
-
+    // Remove
     case 4:
       if (list.valList() == 1)
       {
@@ -481,16 +512,16 @@ int main(int argc, char const *argv[])
         n--;
       }
       break;
-
+    // Show
     case 5:
       if (list.valList() == 1)
         list.showList();
       break;
-
+    // Exit
     case 6:
       printf("Cerrando el programa...\n");
       break;
-
+    // Error
     default:
       printf("La opcion seleccionada es invalida. Intente de nuevo\n");
       break;

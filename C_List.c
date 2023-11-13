@@ -400,26 +400,28 @@ int main()
 
     switch (opc)
     {
+    // Add and sort
     case 1:
       head = addNode(head);
       n++;
       break;
-
+    // Search
     case 2:
       if (valNode(head) == 1)
       {
         searchMenu(head);
       }
       break;
-
+    // Modify and sort
     case 3:
       if (valNode(head) == 1)
       {
         pos = valPos(n);
         modifyPerson(head, pos);
+        sortList(head);
       }
       break;
-
+    // Remove
     case 4:
       if (valNode(head) == 1)
       {
@@ -427,18 +429,17 @@ int main()
         removePerson(&head, pos);
         n--;
       }
-
       break;
-
+    // Show
     case 5:
       if (valNode(head) == 1)
         showList(head);
       break;
-
+    // Exit
     case 6:
       printf("Cerrando el programa...\n");
       break;
-
+    // Error
     default:
       printf("La opcion seleccionada es invalida. Intente de nuevo\n");
       break;
