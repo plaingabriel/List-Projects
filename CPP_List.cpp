@@ -492,7 +492,7 @@ int main(int argc, char const *argv[])
         list.searchMenu();
       }
       break;
-    // Modify and sort
+    // Modify
     case 3:
       if (list.valList() == 1)
       {
